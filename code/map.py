@@ -26,7 +26,9 @@ class Map:
             for number in layer:                                                  # all the obstacles should actually only be loaded once, but all the drawing stuff is supposed to 
     
                 
-                
+                if number==2:#draw grass under bush
+                    self.var.screen.blit(self.indices[0][0],((x*self.var.boxes_size[0])-self.var.camera_scrolling.x,(y*self.var.boxes_size[1])-self.var.camera_scrolling.y))
+                    
                 
                 if self.indices[number][1]==False:#Its not interacting with its surounding
                     self.var.screen.blit(self.indices[number][0],((x*self.var.boxes_size[0])-self.var.camera_scrolling.x,(y*self.var.boxes_size[1])-self.var.camera_scrolling.y))

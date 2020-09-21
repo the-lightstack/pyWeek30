@@ -13,18 +13,46 @@ class Player:
         self.moving_down=False
 
         self.img=pygame.image.load("./images/player_test.png")
-
+        images_width=32
+        self.animation_sprites={"wr":self.get_sprite_sheet([images_width,48],"./images/character_walking_right_sprite_sheet.png"),"wd":self.get_sprite_sheet([images_width,48],"./images/character_walking_down_sprite_sheet.png"),"wl":self.get_sprite_sheet([images_width,48],"./images/character_walking_left_sprite_sheet.png"),"wu":self.get_sprite_sheet([images_width,48],"./images/character_walking_up_sprite_sheet.png"),"sr":self.get_sprite_sheet((images_width,48),"./images/player_idle_poses.png")[3],"sl":self.get_sprite_sheet((images_width,48),"./images/player_idle_poses.png")[2],"su":self.get_sprite_sheet((images_width,48),"./images/player_idle_poses.png")[0],"sd":self.get_sprite_sheet((images_width,48),"./images/player_idle_poses.png")[1]}
+        self.walking_animation_duration=3
         #general game attributes
-        self.moving_speed=7
+        self.last_moving_direction="su"
+
+        self.moving_speed=6
         self.movement_velocity=pygame.Vector2(0,0)
 
+        self.torch_collected=False
+        self.light_beam=None
     #this updates everything and calls all the other functions
+    #def draw_test_light_beam(self):
+        #pygame.draw.aalines(self.screen,)
     def update(self):
         self.update_movement_velocity()
         self.update_pos()
         self.show()
     def show(self):
-        self.var.screen.blit(self.img,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+        #self.var.screen.blit(self.img,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+        if self.movement_velocity.x==0 and self.movement_velocity.y==0:
+            self.var.screen.blit(self.animation_sprites[self.last_moving_direction],(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+        else:#this part is temporary 
+            #self.var.screen.blit(self.img,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+            if self.movement_velocity.y<0 and self.movement_velocity.x>=0:
+                #up image
+                current_image=self.animation_sprites["wu"][(((self.var.frame_counter)//self.walking_animation_duration))%len(self.animation_sprites["wu"])]
+            elif self.movement_velocity.x>0 and self.movement_velocity.y>=0:
+                #right image
+                current_image=self.animation_sprites["wr"][(((self.var.frame_counter)//self.walking_animation_duration))%len(self.animation_sprites["wr"])]
+            elif self.movement_velocity.y>0 and self.movement_velocity.x<=0:
+                #down image
+                current_image=self.animation_sprites["wd"][(((self.var.frame_counter)//self.walking_animation_duration)-1)%len(self.animation_sprites["wd"])]
+            elif self.movement_velocity.x<0 and self.movement_velocity.y<=0:
+                #left image
+                current_image=self.animation_sprites["wl"][(((self.var.frame_counter)//self.walking_animation_duration)-1)%len(self.animation_sprites["wl"])]
+            self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+            
+                
+
 
     def update_movement_velocity(self):
         self.movement_velocity.x=0
@@ -66,3 +94,33 @@ class Player:
                     collide_list.append(obs)
                     
             return collide_list
+
+
+    def get_sprite_sheet(self,size,file,pos=(0,0)):
+        import pygame#file is path_to_file
+        #Initial Values
+        pos=(0,0)
+        len_sprt_x,len_sprt_y = size #sprite size
+        
+        sprt_rect_x,sprt_rect_y = pos #where to find first sprite on sheet
+        sheet = pygame.image.load(file).convert_alpha() #Load the sheet
+        sheet_rect = sheet.get_rect()
+        
+        sprites = []
+        
+        image_size=size
+        print("sheet rect w:",sheet_rect.w)
+        #print("row")
+        for i in range(0,sheet_rect.width,size[0]):#columns
+            #print("column")
+            print("i:",i)    
+            sheet.set_clip(pygame.Rect(sprt_rect_x, sprt_rect_y, len_sprt_x, len_sprt_y)) #find sprite you want
+            sprite = sheet.subsurface(sheet.get_clip()) #grab the sprite you want
+            sprites.append(sprite)
+            sprt_rect_x += len_sprt_x
+        sprt_rect_y += len_sprt_y
+        sprt_rect_x = 0
+
+        #sprites=[pygame.transform.scale(i,(image_size[0],image_size[1])) for i in sprites]
+        #print("sprites:",sprites)
+        return sprites
