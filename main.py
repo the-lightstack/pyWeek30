@@ -14,10 +14,11 @@ class Var:
         self.player=None
         self.clock=pygame.time.Clock()
         self.FPS=30
+
 var=Var()
 var.player=Player(100,100,32,48,var)
 
-Enemies = [Enemy(var, random.choice(range(200, 1000)), random.choice(range(200, 600))) for _ in range(10)]
+Enemies = [Enemy(var, random.choice(range(200, 1000)), random.choice(range(200, 600))) for _ in range(1)]
 
 
 def main():
