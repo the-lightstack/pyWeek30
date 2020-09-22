@@ -23,14 +23,21 @@ class Player:
         self.movement_velocity=pygame.Vector2(0,0)
 
         self.torch_collected=False
-        self.light_beam=None
+        self.light_beam_image=pygame.image.load("./images/light_beam_rect.png").convert_alpha()
+        self.light_beam_rect=pygame.Rect(self.rect.x,self.rect.y,140,40)
+        self.light_beam_image=pygame.transform.scale(self.light_beam_image,self.light_beam_rect[2:])
+        
+        
     #this updates everything and calls all the other functions
-    #def draw_test_light_beam(self):
-        #pygame.draw.aalines(self.screen,)
+    
     def update(self):
         self.update_movement_velocity()
         self.update_pos()
+        self.shoot_laser()
         self.show()
+
+        #if self.torch_collected:
+            #self.draw_test_light_beam()
     def show(self):
         #self.var.screen.blit(self.img,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
         if self.movement_velocity.x==0 and self.movement_velocity.y==0:
@@ -52,21 +59,30 @@ class Player:
             self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
             
                 
-
+    def shoot_laser(self):
+        beam_length=20
+        start_point=pygame.Vector2(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y)
+        end_point=start_point+(self.movement_velocity*beam_length)
+        pygame.draw.line(self.var.screen,(100,40,200),start_point,end_point,10)
 
     def update_movement_velocity(self):
         self.movement_velocity.x=0
         self.movement_velocity.y=0
 
         if self.moving_left:
-            self.movement_velocity.x-=1*self.moving_speed
+            self.movement_velocity.x-=1
         if self.moving_right:
-            self.movement_velocity.x+=1*self.moving_speed
+            self.movement_velocity.x+=1
         if self.moving_up:
-            self.movement_velocity.y-=1*self.moving_speed
+            self.movement_velocity.y-=1
         if self.moving_down:
-            self.movement_velocity.y+=1*self.moving_speed
-
+            self.movement_velocity.y+=1
+        try:
+            self.movement_velocity=self.movement_velocity.normalize()
+        except:
+            pass
+        self.movement_velocity.x=self.movement_velocity.x*self.moving_speed
+        self.movement_velocity.y=self.movement_velocity.y*self.moving_speed
     def update_pos(self):
         self.rect.x+=self.movement_velocity.x
        
@@ -95,11 +111,13 @@ class Player:
                     
             return collide_list
 
+    
 
     def get_sprite_sheet(self,size,file,pos=(0,0)):
         import pygame#file is path_to_file
         #Initial Values
         pos=(0,0)
+  
         len_sprt_x,len_sprt_y = size #sprite size
         
         sprt_rect_x,sprt_rect_y = pos #where to find first sprite on sheet
@@ -124,3 +142,56 @@ class Player:
         #sprites=[pygame.transform.scale(i,(image_size[0],image_size[1])) for i in sprites]
         #print("sprites:",sprites)
         return sprites
+
+    def draw_beam_dir(self,dire):
+        if dire=="l":#left
+            self.var.screen.blit(self.light_beam_image,(self.rect.x-self.var.camera_scrolling.x-self.light_beam_rect.w,self.rect.y-self.var.camera_scrolling.y-0))
+        elif dire=="r":
+            new_image=pygame.transform.flip(self.light_beam_image,True,False)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+self.rect.w+5,self.rect.y-self.var.camera_scrolling.y-0))#,special_flags=pygame.BLEND_RGBA_MIN)
+        elif dire=="d":
+            new_image=pygame.transform.rotate(self.light_beam_image,270)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+5,self.rect.y-self.var.camera_scrolling.y+self.rect.h))#,special_flags=pygame.BLEND_RGBA_MIN)
+        elif dire=="u":
+            new_image=pygame.transform.rotate(self.light_beam_image,90)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+5,self.rect.y-self.var.camera_scrolling.y-(self.light_beam_rect.h*2)-self.rect.h-10))#,special_flags=pygame.BLEND_RGBA_MIN)
+        
+        elif dire=="ul":
+            new_image=pygame.transform.rotate(self.light_beam_image,315)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x-100,self.rect.y-self.var.camera_scrolling.y-(self.light_beam_rect.h*2)+40-self.rect.h-10))#,special_flags=pygame.BLEND_RGBA_MIN)
+        elif dire=="ur":
+            new_image=pygame.transform.rotate(self.light_beam_image,45)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y-83))#,special_flags=pygame.BLEND_RGBA_MIN)
+            test_rect=new_image.get_rect()
+            pygame.draw.rect(self.var.screen,(100,40,200,),test_rect)
+        elif dire=="dl":
+            print("dl")
+            new_image=pygame.transform.rotate(self.light_beam_image,45)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x-100,self.rect.y-self.var.camera_scrolling.y-self.rect.h+80))#,special_flags=pygame.BLEND_RGBA_MIN)
+        elif dire=="dr":
+            new_image=pygame.transform.rotate(self.light_beam_image,315)
+            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+5,self.rect.y-self.var.camera_scrolling.y-10))#,special_flags=pygame.BLEND_RGBA_MIN)
+    
+    def draw_test_light_beam(self):
+        x=self.movement_velocity.x
+        y=self.movement_velocity.y
+        if self.movement_velocity==0:
+            #draw_standing things
+            pass
+        else:
+            if x>0 and y==0:
+                self.draw_beam_dir("r")
+            if x<0 and y==0:
+                self.draw_beam_dir("l")
+            if x==0 and y>0:
+                self.draw_beam_dir("d")
+            if x==0 and y<0:
+                self.draw_beam_dir("u")
+            if x<0 and y<0:#up-left
+                self.draw_beam_dir("ul")
+            if x>0 and y<0:#up-right
+                self.draw_beam_dir("ur")
+            if x<0 and y>0:#down-left
+                self.draw_beam_dir("dl")
+            if x>0 and y>0:#down-right
+                self.draw_beam_dir("dr")
