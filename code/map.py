@@ -7,7 +7,7 @@ class Map:
         self.current_map=None
         self.load_map()#Current map gets assigned here
         self.var=var
-        self.indices={  0:(pygame.image.load("./images/floor_sprite_test.png"),False,False,None),#img_path,Collision(obstacle),has_animation,anim_duration_min_max
+        '''self.indices={  0:(pygame.image.load("./images/floor_sprite_test.png"),False,False,None),#img_path,Collision(obstacle),has_animation,anim_duration_min_max
                         1:("./images/temp_wall.png",True,False,[1,10]),
                         2:("./images/bush_animation_sprites.png",True,True,(5,15)),
                         3:(self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")[0],False,False,None),#beach_left_one
@@ -19,8 +19,14 @@ class Map:
                         9:(self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")[6],False,False,None),#full water tile
                         10:(self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")[7],False,False,None),#halfwater, half sand
                         11:(self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")[8],False,False,None),#swimming, platform
-                        }
-
+                        }'''
+        img=pygame.image.load
+        self.indices=[(i,False,False,None) for i in self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")]
+        self.indices.append(("./images/temp_wall.png",True,False,[0,0]))
+        self.indices.append((img("./images/floor_sprite_test.png"),False,False,None))
+        self.indices.append(("./images/bush_animation_sprites.png",True,True,(5,15)))
+        print(self.indices)
+        
         #when it aint a obstacle the image should be 
         self.init_obstacles()
     def update(self):
@@ -38,14 +44,14 @@ class Map:
         for layer in self.current_map:
             x=0
             for number in layer:                                                  # all the obstacles should actually only be loaded once, but all the drawing stuff is supposed to 
-    
-                
+                tx=y
+                ty=x
                 if number==2:#draw grass under bush
-                    self.var.screen.blit(self.indices[0][0],((x*self.var.boxes_size[0])-self.var.camera_scrolling.x,(y*self.var.boxes_size[1])-self.var.camera_scrolling.y))
+                    self.var.screen.blit(self.indices[0][0],((tx*self.var.boxes_size[0])-self.var.camera_scrolling.x,(ty*self.var.boxes_size[1])-self.var.camera_scrolling.y))
                     
                 
                 if self.indices[number][1]==False:#Its not interacting with its surounding
-                    self.var.screen.blit(self.indices[number][0],((x*self.var.boxes_size[0])-self.var.camera_scrolling.x,(y*self.var.boxes_size[1])-self.var.camera_scrolling.y))
+                    self.var.screen.blit(self.indices[number][0],((tx*self.var.boxes_size[0])-self.var.camera_scrolling.x,(ty*self.var.boxes_size[1])-self.var.camera_scrolling.y))
                 x+=1
             
             y+=1
@@ -53,10 +59,12 @@ class Map:
         y=0
         for layer in self.current_map:
             x=0
-            for number in layer:                                                  
+            for number in layer:
+                tx=y
+                ty=x                                                  
                 # all the obstacles should actually only be loaded once, but all the drawing stuff is supposed to 
                 if self.indices[number][1]==True:#means it is an obstacle
-                    self.var.obstacles.append(Obstacle(x,y,self.var,self.indices[number][0],self.indices[number][2],self.indices[number][3]))
+                    self.var.obstacles.append(Obstacle(tx,ty,self.var,self.indices[number][0],self.indices[number][2],self.indices[number][3]))
                 
                 x+=1
             

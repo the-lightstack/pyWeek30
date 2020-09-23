@@ -24,7 +24,7 @@ class Player:
         #general game attributes
         self.last_moving_direction="su"
 
-        self.moving_speed=6
+        self.moving_speed=10
         self.movement_velocity=pygame.Vector2(0,0)
 
         
@@ -176,7 +176,7 @@ class Knife:
         self.rect=pygame.Rect(x,y,self.w,self.h)
         self.hitbox_rect=pygame.Rect(self.rect.x-10,self.rect.y-10,self.rect.w+20,self.rect.h+20)
         self.color=(92, 40, 136)
-        self.speed=7
+        self.speed=16
         self.max_speed=12
         self.speed_steps=1.5
 

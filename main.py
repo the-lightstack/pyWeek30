@@ -38,6 +38,8 @@ def main():
             self.dead_monk=Torch_Monk(9,14,self)
             self.screen_night_overlay=pygame.image.load("./images/screen_dark_overlay.png").convert_alpha()
             self.screen_night_overlay=pygame.transform.scale(self.screen_night_overlay,self.SCREEN_SIZE)
+            self.Enemies = [Enemy(self, random.choice(range(200, 1000)), random.choice(range(200, 600))) for _ in range(10)]
+
         def update_camera(self):
             self.camera_scrolling.x-=(self.camera_scrolling.x-(self.player.rect.x-self.SCREEN_SIZE[0]/2))/10
             self.camera_scrolling.y-=(self.camera_scrolling.y-(self.player.rect.y-self.SCREEN_SIZE[1]/2))/10
@@ -73,13 +75,12 @@ def main():
     var.camera_scrolling.x=-400
     var.camera_scrolling.y=0
     
-    Enemies = [Enemy(var, random.choice(range(200, 1000)), random.choice(range(200, 600))) for _ in range(10)]
     menu = MainMenu(var)
     inventory = Inventory(var, 20, 600, 230, 110)
 
     while True:
         var.clock.tick(var.FPS)
-        var.frame_counter+=1
+        
 
         # if the quit is pressed, game exits
         if var.exit_game:
@@ -104,7 +105,8 @@ def main():
 
         # game's running
         if var.game_running:
-            var.clock.tick(var.FPS)
+            #print("fps:",var.clock.get_fps())
+           
             var.frame_counter+=1
             #event loop
             var.screen.fill((0,100,200))
@@ -127,7 +129,7 @@ def main():
             var.dead_monk.update()
 
             var.player.update()
-            for enemy in Enemies:
+            for enemy in var.Enemies:
                 enemy.update()
             
             for i in var.obstacles:
