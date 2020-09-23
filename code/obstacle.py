@@ -45,7 +45,7 @@ class Obstacle:#x and y will be multiplicated by 32 are like row and column
         image_size=(32,32)
     
         #print("row")
-        for i in range(0,sheet_rect.width-len_sprt_x,size[0]):#columns
+        for i in range(0,sheet_rect.width,size[0]):#columns
             #print("column")    
             sheet.set_clip(pygame.Rect(sprt_rect_x, sprt_rect_y, len_sprt_x, len_sprt_y)) #find sprite you want
             sprite = sheet.subsurface(sheet.get_clip()) #grab the sprite you want
