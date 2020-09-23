@@ -23,7 +23,7 @@ class Torch_Monk:
             self.var.screen.blit(self.image_without_torch,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
             
     def check_collected(self):
-        if self.hitbox.colliderect(self.var.player):
+        if self.hitbox.colliderect(self.var.player) and self.collected==False:
             self.collected=True
-            self.var.player.torch_collected=True
+            self.var.player.available_knives+=1
             

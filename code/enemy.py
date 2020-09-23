@@ -6,7 +6,7 @@ class Enemy(object):
         self.range = 1050
         self.var = var
         self.img = pygame.image.load('./images/enemy.png')
-
+        self.img=pygame.transform.scale(self.img,(self.rect.w,self.rect.h))
 
         self.movement_speed=2
         self.lives=2

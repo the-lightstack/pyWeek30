@@ -1,4 +1,9 @@
 import pygame
+from random import random#give bullets a bit of randomness
+import random
+from pygame import Vector2
+import math
+import pygame
 pygame.init()
 
 class Player:
@@ -22,19 +27,22 @@ class Player:
         self.moving_speed=6
         self.movement_velocity=pygame.Vector2(0,0)
 
-        self.torch_collected=False
-        self.light_beam_image=pygame.image.load("./images/light_beam_rect.png").convert_alpha()
-        self.light_beam_rect=pygame.Rect(self.rect.x,self.rect.y,140,40)
-        self.light_beam_image=pygame.transform.scale(self.light_beam_image,self.light_beam_rect[2:])
         
-        
+       
+        self.available_knives=0
+        self.may_throw_knife=True
+        self.knives=[]
     #this updates everything and calls all the other functions
-    
+    def update_knives_scroll(self,event):
+        for i in self.knives:
+            i.check_mouse_wheel_scroll(event)
     def update(self):
         self.update_movement_velocity()
         self.update_pos()
-        self.shoot_laser()
+        self.shoot()
         self.show()
+        for i in self.knives:
+            i.update()
 
         #if self.torch_collected:
             #self.draw_test_light_beam()
@@ -58,13 +66,24 @@ class Player:
                 current_image=self.animation_sprites["wl"][(((self.var.frame_counter)//self.walking_animation_duration)-1)%len(self.animation_sprites["wl"])]
             self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
             
-                
-    def shoot_laser(self):
-        beam_length=20
-        start_point=pygame.Vector2(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y)
-        end_point=start_point+(self.movement_velocity*beam_length)
-        pygame.draw.line(self.var.screen,(100,40,200),start_point,end_point,10)
+     
+    def shoot(self):
+        
+        mouse_pos=Vector2(pygame.mouse.get_pos()[0]+self.var.camera_scrolling[0],pygame.mouse.get_pos()[1]+self.var.camera_scrolling[1])
+        playerPos=Vector2(self.rect.x+self.rect.w/2,self.rect.y+self.rect.h/2)
+        difference =Vector2(mouse_pos-playerPos)
 
+        #rotation_z=math.atan2(difference.y,difference.x)
+       
+        self.angle=360-(180 / math.pi) * -math.atan2(difference.y, difference.x)
+   
+        
+        if pygame.mouse.get_pressed()[0] and self.available_knives>0 and self.may_throw_knife:
+            angle=math.radians(self.angle)
+            bulletVel=Vector2(math.cos(angle),math.sin(angle))
+            
+            self.knives.append(Knife(self.rect.x+self.rect.w/2,self.rect.y+self.rect.h/2,bulletVel,self.var))
+            self.available_knives-=1
     def update_movement_velocity(self):
         self.movement_velocity.x=0
         self.movement_velocity.y=0
@@ -127,11 +146,11 @@ class Player:
         sprites = []
         
         image_size=size
-        print("sheet rect w:",sheet_rect.w)
+        #print("sheet rect w:",sheet_rect.w)
         #print("row")
         for i in range(0,sheet_rect.width,size[0]):#columns
             #print("column")
-            print("i:",i)    
+            #print("i:",i)    
             sheet.set_clip(pygame.Rect(sprt_rect_x, sprt_rect_y, len_sprt_x, len_sprt_y)) #find sprite you want
             sprite = sheet.subsurface(sheet.get_clip()) #grab the sprite you want
             sprites.append(sprite)
@@ -143,55 +162,128 @@ class Player:
         #print("sprites:",sprites)
         return sprites
 
-    def draw_beam_dir(self,dire):
-        if dire=="l":#left
-            self.var.screen.blit(self.light_beam_image,(self.rect.x-self.var.camera_scrolling.x-self.light_beam_rect.w,self.rect.y-self.var.camera_scrolling.y-0))
-        elif dire=="r":
-            new_image=pygame.transform.flip(self.light_beam_image,True,False)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+self.rect.w+5,self.rect.y-self.var.camera_scrolling.y-0))#,special_flags=pygame.BLEND_RGBA_MIN)
-        elif dire=="d":
-            new_image=pygame.transform.rotate(self.light_beam_image,270)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+5,self.rect.y-self.var.camera_scrolling.y+self.rect.h))#,special_flags=pygame.BLEND_RGBA_MIN)
-        elif dire=="u":
-            new_image=pygame.transform.rotate(self.light_beam_image,90)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+5,self.rect.y-self.var.camera_scrolling.y-(self.light_beam_rect.h*2)-self.rect.h-10))#,special_flags=pygame.BLEND_RGBA_MIN)
-        
-        elif dire=="ul":
-            new_image=pygame.transform.rotate(self.light_beam_image,315)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x-100,self.rect.y-self.var.camera_scrolling.y-(self.light_beam_rect.h*2)+40-self.rect.h-10))#,special_flags=pygame.BLEND_RGBA_MIN)
-        elif dire=="ur":
-            new_image=pygame.transform.rotate(self.light_beam_image,45)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y-83))#,special_flags=pygame.BLEND_RGBA_MIN)
-            test_rect=new_image.get_rect()
-            pygame.draw.rect(self.var.screen,(100,40,200,),test_rect)
-        elif dire=="dl":
-            print("dl")
-            new_image=pygame.transform.rotate(self.light_beam_image,45)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x-100,self.rect.y-self.var.camera_scrolling.y-self.rect.h+80))#,special_flags=pygame.BLEND_RGBA_MIN)
-        elif dire=="dr":
-            new_image=pygame.transform.rotate(self.light_beam_image,315)
-            self.var.screen.blit(new_image,(self.rect.x-self.var.camera_scrolling.x+5,self.rect.y-self.var.camera_scrolling.y-10))#,special_flags=pygame.BLEND_RGBA_MIN)
     
-    def draw_test_light_beam(self):
-        x=self.movement_velocity.x
-        y=self.movement_velocity.y
-        if self.movement_velocity==0:
-            #draw_standing things
-            pass
+   
+
+class Knife:
+    def __init__(self,x,y,vel,var):#have to make it so knives die after time or if they hit player or maybe object or out of bounds
+        
+        self.vel=vel
+        self.time_limit=1
+        self.w=15
+        self.h=30
+        self.rect=pygame.Rect(x,y,self.w,self.h)
+        self.hitbox_rect=pygame.Rect(self.rect.x-10,self.rect.y-10,self.rect.w+20,self.rect.h+20)
+        self.color=(92, 40, 136)
+        self.speed=7
+        self.max_speed=12
+        self.speed_steps=1.5
+
+        self.image_flying=pygame.transform.scale(self.get_sprite_sheet((10,20),"./images/knife_sprite_sheet.png")[0],(self.rect.w,self.rect.h))
+        self.image_collectable=pygame.transform.scale(self.get_sprite_sheet((10,20),"./images/knife_sprite_sheet.png")[1],(self.rect.w,self.rect.h))
+
+        self.changed_direction=False
+        self.flying=True
+        self.var=var
+        self.angle=360-self.var.player.angle-90
+        
+    def show(self):
+       #this is temporaryly
+        #pygame.draw.rect(self.var.screen,self.color,(self.rect.x-self.var.camera_scrolling[0],self.rect.y-self.var.camera_scrolling[1],self.w,self.w))
+        temp_angle=self.angle
+        if self.speed<0:
+            temp_angle*=2
+
+        if self.flying==True:
+            temp_image=pygame.transform.rotate(self.image_flying,temp_angle)
         else:
-            if x>0 and y==0:
-                self.draw_beam_dir("r")
-            if x<0 and y==0:
-                self.draw_beam_dir("l")
-            if x==0 and y>0:
-                self.draw_beam_dir("d")
-            if x==0 and y<0:
-                self.draw_beam_dir("u")
-            if x<0 and y<0:#up-left
-                self.draw_beam_dir("ul")
-            if x>0 and y<0:#up-right
-                self.draw_beam_dir("ur")
-            if x<0 and y>0:#down-left
-                self.draw_beam_dir("dl")
-            if x>0 and y>0:#down-right
-                self.draw_beam_dir("dr")
+            temp_image=pygame.transform.rotate(self.image_collectable,temp_angle)
+        if self.speed<0:
+            temp_image=pygame.transform.flip(temp_image,False,True)
+            
+        self.var.screen.blit(temp_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+    def update_pos(self):
+        if self.flying==True:
+            self.rect.x+=int(self.vel.x*self.speed)
+            self.rect.y+=int(self.vel.y*self.speed)
+            #currently checks if bullet is supposed to die
+        
+        
+        #self.vel+=self.vel/200
+       
+        
+    def check_colliding(self):
+       for i in self.var.obstacles:
+           if i.rect.colliderect(self.rect):
+               self.flying=False
+
+    def update(self):
+        self.update_pos()
+        self.check_colliding()
+        self.show()
+        self.check_player_collecting()
+        #self.check_mouse_wheel_scroll()
+        self.hitbox_rect[:2]=self.rect[:2]
+    
+    def get_sprite_sheet(self,size,file,pos=(0,0)):
+        import pygame#file is path_to_file
+        #Initial Values
+        pos=(0,0)
+  
+        len_sprt_x,len_sprt_y = size #sprite size
+        
+        sprt_rect_x,sprt_rect_y = pos #where to find first sprite on sheet
+        sheet = pygame.image.load(file).convert_alpha() #Load the sheet
+        sheet_rect = sheet.get_rect()
+        
+        sprites = []
+        
+        image_size=size
+        
+        for i in range(0,sheet_rect.width,size[0]):#columns
+            #print("column")
+             
+            sheet.set_clip(pygame.Rect(sprt_rect_x, sprt_rect_y, len_sprt_x, len_sprt_y)) #find sprite you want
+            sprite = sheet.subsurface(sheet.get_clip()) #grab the sprite you want
+            sprites.append(sprite)
+            sprt_rect_x += len_sprt_x
+        sprt_rect_y += len_sprt_y
+        sprt_rect_x = 0
+
+        #sprites=[pygame.transform.scale(i,(image_size[0],image_size[1])) for i in sprites]
+        #print("sprites:",sprites)
+        return sprites
+
+    def check_player_collecting(self):
+        if self.flying==False:
+            if self.var.player.rect.colliderect(self.rect):
+                self.var.player.available_knives+=1
+                self.var.player.knives.remove(self)
+    def check_mouse_wheel_scroll(self,event):
+        '''
+        if event.type==pygame.MOUSEBUTTONDOWN:
+            if event.button==4:
+                if self.speed+self.speed_steps<self.max_speed:
+                    self.speed+=self.speed_steps
+            elif event.button==5:
+                if self.speed-self.speed_steps>self.max_speed*-1:
+                    self.speed-=self.speed_steps
+        '''
+        if event.type==pygame.MOUSEBUTTONDOWN and not self.changed_direction:
+            if event.button==1:
+                self.speed*=-1
+                self.changed_direction=True
+        #Picking up knife out of the air
+        '''if event.type==pygame.KEYDOWN:
+            if event.key==pygame.K_SPACE:
+                if self.hitbox_rect.colliderect(self.var.player.rect) :
+                    self.var.player.available_knives+=1
+                    self.var.player.knives.remove(self)'''
+        keys=pygame.key.get_pressed()
+        
+        if keys[pygame.K_SPACE]:
+            
+            if self.hitbox_rect.colliderect(self.var.player.rect):
+                self.var.player.available_knives+=1
+                self.var.player.knives.remove(self)
+        

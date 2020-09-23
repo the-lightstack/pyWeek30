@@ -35,6 +35,29 @@ def main():
         def update_camera(self):
             self.camera_scrolling.x-=(self.camera_scrolling.x-(self.player.rect.x-self.SCREEN_SIZE[0]/2))/10
             self.camera_scrolling.y-=(self.camera_scrolling.y-(self.player.rect.y-self.SCREEN_SIZE[1]/2))/10
+        def set_player_move_bools(self,event):
+            if event.type==pygame.KEYDOWN:
+                if event.key==pygame.K_w:
+                    self.player.moving_up=True
+                    self.player.last_moving_direction="su"
+                if event.key==pygame.K_a:
+                    self.player.moving_left=True
+                    self.player.last_moving_direction="sl"
+                if event.key==pygame.K_s:
+                    self.player.moving_down=True
+                    self.player.last_moving_direction="sd"
+                if event.key==pygame.K_d:
+                    self.player.moving_right=True
+                    self.player.last_moving_direction="sr"
+            if event.type==pygame.KEYUP:
+                if event.key==pygame.K_w:
+                    self.player.moving_up=False
+                if event.key==pygame.K_a:
+                    self.player.moving_left=False
+                if event.key==pygame.K_s:
+                    self.player.moving_down=False
+                if event.key==pygame.K_d:
+                    self.player.moving_right=False
 
     var=Var()
     var.player=Player(100,400,32,48,var)
@@ -48,46 +71,27 @@ def main():
         var.clock.tick(var.FPS)
         var.frame_counter+=1
         #event loop
+        var.screen.fill((0,100,200))
+        var.map.update()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
                 var.game_running=False
                 pygame.quit()
-            if event.type==pygame.KEYDOWN:
-                if event.key==pygame.K_w:
-                    var.player.moving_up=True
-                    var.player.last_moving_direction="su"
-                if event.key==pygame.K_a:
-                    var.player.moving_left=True
-                    var.player.last_moving_direction="sl"
-                if event.key==pygame.K_s:
-                    var.player.moving_down=True
-                    var.player.last_moving_direction="sd"
-                if event.key==pygame.K_d:
-                    var.player.moving_right=True
-                    var.player.last_moving_direction="sr"
-            if event.type==pygame.KEYUP:
-                if event.key==pygame.K_w:
-                    var.player.moving_up=False
-                if event.key==pygame.K_a:
-                    var.player.moving_left=False
-                if event.key==pygame.K_s:
-                    var.player.moving_down=False
-                if event.key==pygame.K_d:
-                    var.player.moving_right=False
+            var.set_player_move_bools(event)
+            var.player.update_knives_scroll(event)
 
-        var.screen.fill((0,0,0))
-        var.map.update()
         for i in var.obstacles:
             i.update()
         var.dead_monk.update()
         var.player.update()
         
+       
         
         #will later be for all enemys
-        en.update()
+       
         
 
-        var.screen.blit(var.screen_night_overlay,(0,0))
+        #var.screen.blit(var.screen_night_overlay,(0,0))
         pygame.display.flip()
         var.update_camera()
 
