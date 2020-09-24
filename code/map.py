@@ -1,10 +1,12 @@
-import pygame
+import pygame, time
 pygame.init()
 from code.obstacle import Obstacle
+
 class Map:
     def __init__(self,var):
         self.current_map_path="./maps/map1.txt"
         self.current_map=None
+        self.fountains = [BoostFountain(400, 400, 70, 70, var), HealthFountain(500, 600, 70, 70, var)]
         self.load_map()#Current map gets assigned here
         self.var=var
         '''self.indices={  0:(pygame.image.load("./images/floor_sprite_test.png"),False,False,None),#img_path,Collision(obstacle),has_animation,anim_duration_min_max
@@ -29,6 +31,7 @@ class Map:
         
         #when it aint a obstacle the image should be 
         self.init_obstacles()
+
     def update(self):
         self.show()
         
@@ -55,6 +58,10 @@ class Map:
                 x+=1
             
             y+=1
+        
+        for fountain in self.fountains:
+            fountain.show()
+
     def init_obstacles(self):
         y=0
         for layer in self.current_map:
@@ -95,3 +102,39 @@ class Map:
 
         sprites=[pygame.transform.scale(i,(image_size[0],image_size[1])) for i in sprites]
         return sprites
+
+class Fountain:
+    def __init__(self, x, y, width, height, var):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.interactable_area = pygame.Rect(x-50, y-50, width+100, height+100)
+        self.var = var
+
+    def show(self):
+        for image in self.images:
+            self.var.screen.blit(image, (self.rect.x-self.var.camera_scrolling.x, self.rect.y - self.var.camera_scrolling.y, *self.rect[2:]))
+    
+    def refill(self):
+        for item in self.var.inventory.slots[:3]:
+            if item.magic == self.magic:
+                if item.empty:
+                    print(f'Re-filling {item.magic} potion')
+                    for i in range(3,0,-1):
+                        time.sleep(1)
+                        print(str(i) + '..')
+                    item.empty = False
+                else:
+                    print('Already full')
+                    
+
+
+class BoostFountain(Fountain):
+    magic = 'boost'
+    images = [pygame.image.load('./images/purplefountain.png')]
+
+class HealthFountain(Fountain):
+    magic = 'health'
+    images = [pygame.image.load('./images/fountain.png')]
+
+class StealthFountain(Fountain):
+    magic = 'stealth'
+    images = [pygame.image.load('./images/fountain.png')]  

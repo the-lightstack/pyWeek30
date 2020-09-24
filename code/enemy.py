@@ -6,7 +6,7 @@ class Enemy(object):
         self.inipos = ('x' if random.choice([0,1]) else 'y', *self.rect[:2])
 
         self.flying_imgs=[pygame.image.load("./images/bug.png"),pygame.image.load("./images/bug1.png"),pygame.image.load("./images/bug2.png"),pygame.image.load("./images/bug3.png"),pygame.image.load("./images/bug4.png")]
-        self.flying_animation_duration=random.randint(2,10)
+        self.flying_animation_duration=random.randint(2,5)
         self.attacking=False
         self.dead=False
         self.animation_start_frame=1000000000000000000000000
@@ -29,6 +29,7 @@ class Enemy(object):
         if self.attacking==False:
             current_image=self.flying_imgs[(((self.var.frame_counter)//self.flying_animation_duration))%len(self.flying_imgs)]
             self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+    
     def update(self):
         if self.dead==True:
            self.death_animation()
@@ -80,9 +81,21 @@ class Enemy(object):
 
             self.draw()
         self.check_self_dead()
+
     def check_collision(self):
         if self.rect.colliderect(self.var.player.rect):
+            if self.var.player.stealth:
+                if self.var.player.stealth_counter < 0:
+                    self.var.player.stealth_counter = 100
+                    self.var.player.stealth = False
+                    print("Stealth mode finished.")
+                else:
+                    self.var.player.stealth_counter -= 1
+                return False
+            if self.var.player.moving_speed == 10:
+                self.var.player.decrease_health()
             return True
+            
 
     def death_animation(self):
         print("frame-couner:",self.var.frame_counter)
@@ -102,6 +115,7 @@ class Enemy(object):
                 self.particles=[]
             
                 self.var.Enemies.remove(self)
+                
     def check_self_dead(self):
         for i in self.var.player.knives:
             if self.rect.colliderect(i.rect):

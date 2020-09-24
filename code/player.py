@@ -4,6 +4,7 @@ import random
 from pygame import Vector2
 import math
 import pygame
+
 pygame.init()
 
 class Player:
@@ -11,11 +12,15 @@ class Player:
         self.rect=pygame.Rect(x,y,w,h)
         self.hitbox=pygame.Rect(x,y,w,h)
         self.var=var
-        self.health = 100
+        self.health = HealthBar(1000, 10, 100, 20, self.var)
+        self.health_counter = 4
         self.moving_left=False
         self.moving_up=False
         self.moving_right=False
         self.moving_down=False
+
+        self.stealth = False
+        self.stealth_counter = 100
 
         self.img=pygame.image.load("./images/player_test.png")
         images_width=32
@@ -25,6 +30,7 @@ class Player:
         self.last_moving_direction="su"
 
         self.moving_speed=10
+        self.boost_counter = 15
         self.movement_velocity=pygame.Vector2(0,0)
 
         
@@ -36,6 +42,7 @@ class Player:
     def update_knives_scroll(self,event):
         for i in self.knives:
             i.check_mouse_wheel_scroll(event)
+
     def update(self):
         self.update_movement_velocity()
         self.update_pos()
@@ -65,6 +72,8 @@ class Player:
                 #left image
                 current_image=self.animation_sprites["wl"][(((self.var.frame_counter)//self.walking_animation_duration)-1)%len(self.animation_sprites["wl"])]
             self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+        
+        self.health.draw()
             
      
     def shoot(self):
@@ -84,6 +93,7 @@ class Player:
             
             self.knives.append(Knife(self.rect.x+self.rect.w/2,self.rect.y+self.rect.h/2,bulletVel,self.var))
             self.available_knives-=1
+
     def update_movement_velocity(self):
         self.movement_velocity.x=0
         self.movement_velocity.y=0
@@ -102,6 +112,14 @@ class Player:
             pass
         self.movement_velocity.x=self.movement_velocity.x*self.moving_speed
         self.movement_velocity.y=self.movement_velocity.y*self.moving_speed
+
+        if self.moving_speed != 10:
+            self.boost_counter -= 1
+            if self.boost_counter < 0:
+                self.boost_counter = 10
+                self.moving_speed -= 1
+                
+
     def update_pos(self):
         self.rect.x+=self.movement_velocity.x
        
@@ -122,14 +140,28 @@ class Player:
                 self.rect.bottom=i.rect.top
             if self.movement_velocity.y<0:
                 self.rect.top=i.rect.bottom
+        
+
 
     def check_obstacle_collision(self):
             collide_list=[]
             for obs in self.var.obstacles:
                 if self.rect.colliderect(obs.rect):
                     collide_list.append(obs)
-                    
+            
+            for fountain in self.var.map.fountains:
+                if self.rect.colliderect(fountain.rect):
+                    collide_list.append(fountain)
+
             return collide_list
+    
+    def check_interactable_area(self, event):
+        for fountain in self.var.map.fountains:
+            if self.rect.colliderect(fountain.interactable_area):
+                if event.type == pygame.KEYDOWN:
+                    key = pygame.key.get_pressed()
+                    if key[pygame.K_z]:
+                        fountain.refill()
 
     
 
@@ -162,6 +194,25 @@ class Player:
         #sprites=[pygame.transform.scale(i,(image_size[0],image_size[1])) for i in sprites]
         #print("sprites:",sprites)
         return sprites
+    
+    def decrease_health(self):
+        self.health_counter -= 1
+        if self.health_counter < 0:
+            self.health.value -= 1
+            self.health_counter = 4
+
+
+class HealthBar():
+    def __init__(self, x, y, width, height, var):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.var = var
+        self.value = 100
+        self.bar = pygame.image.load('./images/healthbar.png')
+    
+    def draw(self):
+        self.var.screen.blit(self.bar, self.rect[:2])
+        pygame.draw.rect(self.var.screen, (30,180,60), (self.rect.x+20, self.rect.y+45, (self.rect.w+60)*self.value//100, self.rect.h-10))
+
 
     
    
@@ -287,4 +338,6 @@ class Knife:
             if self.hitbox_rect.colliderect(self.var.player.rect):
                 self.var.player.available_knives+=1
                 self.var.player.knives.remove(self)
+    
+
         

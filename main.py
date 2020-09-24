@@ -76,7 +76,7 @@ def main():
     var.camera_scrolling.y=0
     
     menu = MainMenu(var)
-    inventory = Inventory(var, 20, 600, 230, 110)
+    var.inventory = Inventory(var, 20, 600, 230, 110)
 
     while True:
         var.clock.tick(var.FPS)
@@ -121,8 +121,9 @@ def main():
                         var.main_menu = True
                 var.set_player_move_bools(event)
                 var.player.update_knives_scroll(event)
-                inventory.isClicked(event)
-                inventory.use_item(event)
+                var.player.check_interactable_area(event)
+                var.inventory.isClicked(event)
+                var.inventory.use_item(event)
 
             for i in var.obstacles:
                 i.update()
@@ -135,7 +136,7 @@ def main():
             for i in var.obstacles:
                 i.update()
 
-            inventory.draw()
+            var.inventory.draw()
 
         pygame.display.flip()
         var.update_camera()
