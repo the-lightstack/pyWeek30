@@ -105,6 +105,8 @@ class Map:
         return sprites
 
 class Fountain:
+    dialog = Dialog(1000, 650, 100, 50, 'Filling up... ')
+
     def __init__(self, x, y, width, height, var):
         self.rect = pygame.Rect(x, y, width, height)
         self.interactable_area = pygame.Rect(x-50, y-50, width+100, height+100)
@@ -113,13 +115,21 @@ class Fountain:
     def show(self):
         for image in self.images:
             self.var.screen.blit(image, (self.rect.x-self.var.camera_scrolling.x, self.rect.y - self.var.camera_scrolling.y, *self.rect[2:]))
-        self.dialog.draw(self.var)
+        
+        if self.dialog.show:
+            self.dialog.draw(self.var)
+            print(self.dialog.counter)
+            if self.dialog.counter < 0:
+                self.dialog.counter = 100000
+                self.dialog.show = False
+
     
     def refill(self):
         for item in self.var.inventory.slots[:3]:
             if item.magic == self.magic:
                 if item.empty:
                     print(f'Re-filling {item.magic} potion')
+                    self.dialog.show = True
                     item.empty = False
                 else:
                     print('Already full')
@@ -127,16 +137,13 @@ class Fountain:
 
 
 class BoostFountain(Fountain):
-    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'boost'
     images = [pygame.image.load('./images/purplefountain.png')]
 
 class HealthFountain(Fountain):
-    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'health'
     images = [pygame.image.load('./images/greenfountain.png')]
 
 class StealthFountain(Fountain):
-    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'stealth'
     images = [pygame.image.load('./images/yellowfountain.png')]  
