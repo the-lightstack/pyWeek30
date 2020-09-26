@@ -22,6 +22,7 @@ def main():
             self.game_running=False
             self.exit_game = False
             self.main_menu = True
+            self.game_over = False
             self.player=None
             self.clock=pygame.time.Clock()
             self.FPS=30
@@ -137,6 +138,12 @@ def main():
                 i.update()
 
             var.inventory.draw()
+        
+        if var.game_over:
+            print("Game over")
+            var.game_over = False
+            main()
+
 
         pygame.display.flip()
         var.update_camera()

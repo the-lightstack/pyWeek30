@@ -6,6 +6,7 @@ class Enemy(object):
         self.inipos = ('x' if random.choice([0,1]) else 'y', *self.rect[:2])
 
         self.flying_imgs=[pygame.image.load("./images/bug.png"),pygame.image.load("./images/bug1.png"),pygame.image.load("./images/bug2.png"),pygame.image.load("./images/bug3.png"),pygame.image.load("./images/bug4.png")]
+        self.attacking_imgs=[pygame.image.load("./images/bug.png"),pygame.image.load("./images/bug-attack.png"),pygame.image.load("./images/bug-attack1.png"),pygame.image.load("./images/bug-attack2.png"),pygame.image.load("./images/bug-attack3.png")]
         self.flying_animation_duration=random.randint(2,5)
         self.attacking=False
         self.dead=False
@@ -26,9 +27,11 @@ class Enemy(object):
     
     def draw(self):
         #self.var.screen.blit(self.img, (self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
-        if self.attacking==False:
+        if not self.attacking:
             current_image=self.flying_imgs[(((self.var.frame_counter)//self.flying_animation_duration))%len(self.flying_imgs)]
-            self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
+        else:
+            current_image=self.attacking_imgs[(((self.var.frame_counter)//self.flying_animation_duration))%len(self.flying_imgs)]
+        self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
     
     def update(self):
         if self.dead==True:
@@ -93,8 +96,11 @@ class Enemy(object):
                     self.var.player.stealth_counter -= 1
                 return False
             if self.var.player.moving_speed == 10:
+                self.attacking = True
                 self.var.player.decrease_health()
             return True
+        else:
+            self.attacking = False
             
 
     def death_animation(self):

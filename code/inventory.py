@@ -1,5 +1,6 @@
 import pygame
 from code.menu import Button
+from code.dialog import Dialog
 
 pygame.init()
 

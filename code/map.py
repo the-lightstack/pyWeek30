@@ -1,12 +1,13 @@
 import pygame, time
 pygame.init()
 from code.obstacle import Obstacle
+from code.dialog import Dialog
 
 class Map:
     def __init__(self,var):
         self.current_map_path="./maps/map1.txt"
         self.current_map=None
-        self.fountains = [BoostFountain(400, 400, 70, 70, var), HealthFountain(500, 600, 70, 70, var)]
+        self.fountains = [BoostFountain(400, 400, 70, 70, var), HealthFountain(500, 600, 70, 70, var), StealthFountain(1000, 200, 70, 70, var)]
         self.load_map()#Current map gets assigned here
         self.var=var
         '''self.indices={  0:(pygame.image.load("./images/floor_sprite_test.png"),False,False,None),#img_path,Collision(obstacle),has_animation,anim_duration_min_max
@@ -112,15 +113,13 @@ class Fountain:
     def show(self):
         for image in self.images:
             self.var.screen.blit(image, (self.rect.x-self.var.camera_scrolling.x, self.rect.y - self.var.camera_scrolling.y, *self.rect[2:]))
+        self.dialog.draw(self.var)
     
     def refill(self):
         for item in self.var.inventory.slots[:3]:
             if item.magic == self.magic:
                 if item.empty:
                     print(f'Re-filling {item.magic} potion')
-                    for i in range(3,0,-1):
-                        time.sleep(1)
-                        print(str(i) + '..')
                     item.empty = False
                 else:
                     print('Already full')
@@ -128,13 +127,16 @@ class Fountain:
 
 
 class BoostFountain(Fountain):
+    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'boost'
     images = [pygame.image.load('./images/purplefountain.png')]
 
 class HealthFountain(Fountain):
+    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'health'
-    images = [pygame.image.load('./images/fountain.png')]
+    images = [pygame.image.load('./images/greenfountain.png')]
 
 class StealthFountain(Fountain):
+    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'stealth'
-    images = [pygame.image.load('./images/fountain.png')]  
+    images = [pygame.image.load('./images/yellowfountain.png')]  

@@ -43,7 +43,13 @@ class Player:
         for i in self.knives:
             i.check_mouse_wheel_scroll(event)
 
+    def check_health(self):
+        if self.health.value < 0:
+            self.var.game_running = False
+            self.var.game_over = True
+
     def update(self):
+        self.check_health()
         self.update_movement_velocity()
         self.update_pos()
         self.shoot()
