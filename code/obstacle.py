@@ -3,8 +3,8 @@ pygame.init()
 import random
 #so we can add like walls,bushes,rivers or houses
 class Obstacle:#x and y will be multiplicated by 32 are like row and column
-    def __init__(self,x,y,var,img_path,has_animation,anim_dur_min_max):#animation is gonna be true or false
-        self.rect=pygame.Rect(x*var.boxes_size[0],y*var.boxes_size[1],var.boxes_size[0],var.boxes_size[1])
+    def __init__(self,x,y,var,img_path,has_animation,anim_dur_min_max,width=32,height=32):#animation is gonna be true or false
+        self.rect=pygame.Rect(x*var.boxes_size[0],y*var.boxes_size[1],width,height)
         self.var=var
         self.img_path=img_path
         self.has_animation=has_animation
