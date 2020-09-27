@@ -31,7 +31,7 @@ class Map:
         self.indices.append(("./images/bush_animation_sprites.png",True,True,(5,15)))
         self.indices.append((img("./images/floor_sprite_test.png"),False,False,None))
         
-        print(self.indices)
+        #print(self.indices)
         
         #when it aint a obstacle the image should be 
         self.init_obstacles()
@@ -125,11 +125,12 @@ class Fountain:
         for item in self.var.inventory.slots[:3]:
             if item.magic == self.magic:
                 if item.empty:
-                    print(f'Re-filling {item.magic} potion')
+                    #print(f'Re-filling {item.magic} potion')
                     self.dialog.show = True
                     item.empty = False
                 else:
-                    print('Already full')
+                    #print('Already full')
+                    pass
                     
 
 

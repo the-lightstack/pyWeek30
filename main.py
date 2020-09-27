@@ -29,13 +29,14 @@ def main():
             
             self.boxes_size=(32,32)
             self.camera_scrolling=pygame.Vector2(100,0)
-
+            self.game_music=pygame.mixer.music.load("./images/game_music.wav")
+            pygame.mixer.music.play(-1)
             #game stuff
             self.frame_counter=0
             self.level_counter=0
             self.obstacles=[]
             self.map=Map(self)
-
+            self.show_trophy=False
             self.dead_monk=Torch_Monk(9,14,self)
             self.screen_night_overlay=pygame.image.load("./images/screen_dark_overlay.png").convert_alpha()
             self.screen_night_overlay=pygame.transform.scale(self.screen_night_overlay,self.SCREEN_SIZE)
@@ -133,18 +134,20 @@ def main():
                 i.update()
             var.dead_monk.update()
             #blitting goal
-            var.screen.blit(var.goal_img,(var.goal_rect.x-var.camera_scrolling.x,var.goal_rect.y-var.camera_scrolling.y))
-            #checking for goal player collision
-            if var.player.rect.colliderect(var.goal_rect):
-                var.main_menu=True
-                var.game_running=False
-                var.player.rect.x+=100
+            if var.show_trophy:
+                var.screen.blit(var.goal_img,(var.goal_rect.x-var.camera_scrolling.x,var.goal_rect.y-var.camera_scrolling.y))
+                #checking for goal player collision
+                if var.player.rect.colliderect(var.goal_rect):
+                    var.main_menu=True
+                    var.game_running=False
+                    var.player.rect.x+=100
+            
             var.player.update()
             enemy_len = len(var.Enemies)
             for enemy in var.Enemies:
                 enemy.update()
             
-            
+            var.player.health.draw()
             var.inventory.draw()
         
         if var.game_over:

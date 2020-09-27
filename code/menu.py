@@ -6,9 +6,9 @@ class Button:
     
     def isClicked(self, pos):
         x, y , w, h= self.rect
-        print(pos)
+        #print(pos)
         if x <= pos[0] and y <= pos[1] and x+w >= pos[0] and y+h >= pos[1]:#
-            print("clicked")
+            #print("clicked")
             return True
         return False
     
@@ -69,7 +69,12 @@ class MainMenu:
         txt_surf3=self.Font.render(self.tut_texts[2],True,(0,0,0))
         txt_surf4=self.Font.render(self.tut_texts[3],True,(0,0,0))
 
+        txt_surf5=pygame.transform.rotate(self.Font.render("Find the trophy!",True,(29, 76, 226)),20)
+        txt_surf6=pygame.transform.rotate(self.Font.render("Kill enemies to unlock the trophy",True,(29, 76, 226)),13)
+
         self.var.screen.blit(txt_surf1,(800,300))
         self.var.screen.blit(txt_surf2,(800,350))
         self.var.screen.blit(txt_surf3,(800,400))
         self.var.screen.blit(txt_surf4,(800,450))
+        self.var.screen.blit(txt_surf5,(100,400))
+        self.var.screen.blit(txt_surf6,(100,260))

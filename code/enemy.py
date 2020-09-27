@@ -93,7 +93,7 @@ class Enemy(object):
                 if self.var.player.stealth_counter < 0:
                     self.var.player.stealth_counter = 100
                     self.var.player.stealth = False
-                    print("Stealth mode finished.")
+                    #print("Stealth mode finished.")
                 else:
                     self.var.player.stealth_counter -= 1
                 return False
@@ -128,8 +128,10 @@ class Enemy(object):
                     self.var.Enemies.remove(self)
                 except ValueError:
                     pass
-                if len(self.var.Enemies) > 500:
+                #print("len of enemies:",len(self.var.Enemies))
+                if len(self.var.Enemies) >= 240:
                     self.spawn = False
+                    self.var.show_trophy=True
                     # add the trophy thing here
                 if self.spawn:
                     for _ in range(2):

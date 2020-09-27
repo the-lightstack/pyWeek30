@@ -79,7 +79,7 @@ class Player:
                 current_image=self.animation_sprites["wl"][(((self.var.frame_counter)//self.walking_animation_duration)-1)%len(self.animation_sprites["wl"])]
             self.var.screen.blit(current_image,(self.rect.x-self.var.camera_scrolling.x,self.rect.y-self.var.camera_scrolling.y))
         
-        self.health.draw()
+        #self.health.draw()
             
      
     def shoot(self):
