@@ -24,10 +24,13 @@ class Map:
                         11:(self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")[8],False,False,None),#swimming, platform
                         }'''
         img=pygame.image.load
-        self.indices=[(i,False,False,None) for i in self.get_sprite_sheet((32,32),"./images/beach_water_sprites.png")]
+        self.indices=[(i,False,False,None) for i in self.get_sprite_sheet((32,32),"./images/world_sprite_sheet.png")]
+        self.indices.pop()
+        
         self.indices.append(("./images/temp_wall.png",True,False,[0,0]))
-        self.indices.append((img("./images/floor_sprite_test.png"),False,False,None))
         self.indices.append(("./images/bush_animation_sprites.png",True,True,(5,15)))
+        self.indices.append((img("./images/floor_sprite_test.png"),False,False,None))
+        
         print(self.indices)
         
         #when it aint a obstacle the image should be 
@@ -50,8 +53,8 @@ class Map:
             for number in layer:                                                  # all the obstacles should actually only be loaded once, but all the drawing stuff is supposed to 
                 tx=y
                 ty=x
-                if number==2:#draw grass under bush
-                    self.var.screen.blit(self.indices[0][0],((tx*self.var.boxes_size[0])-self.var.camera_scrolling.x,(ty*self.var.boxes_size[1])-self.var.camera_scrolling.y))
+                if number==27:#draw grass under bush
+                    self.var.screen.blit(self.indices[28][0],((tx*self.var.boxes_size[0])-self.var.camera_scrolling.x,(ty*self.var.boxes_size[1])-self.var.camera_scrolling.y))
                     
                 
                 if self.indices[number][1]==False:#Its not interacting with its surounding
@@ -110,10 +113,11 @@ class Fountain:
         self.interactable_area = pygame.Rect(x-50, y-50, width+100, height+100)
         self.var = var
 
+        #self.var.obstacles.append(Obstacle())
     def show(self):
         for image in self.images:
             self.var.screen.blit(image, (self.rect.x-self.var.camera_scrolling.x, self.rect.y - self.var.camera_scrolling.y, *self.rect[2:]))
-        self.dialog.draw(self.var)
+        #self.dialog.draw(self.var)
     
     def refill(self):
         for item in self.var.inventory.slots[:3]:
@@ -127,16 +131,16 @@ class Fountain:
 
 
 class BoostFountain(Fountain):
-    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
+    #dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'boost'
     images = [pygame.image.load('./images/purplefountain.png')]
 
 class HealthFountain(Fountain):
-    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
+    #dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'health'
     images = [pygame.image.load('./images/greenfountain.png')]
 
 class StealthFountain(Fountain):
-    dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
+    #dialog = Dialog(800, 650, 50, 100, 'Filling up... ')
     magic = 'stealth'
     images = [pygame.image.load('./images/yellowfountain.png')]  

@@ -7,7 +7,7 @@ class Button:
     def isClicked(self, pos):
         x, y , w, h= self.rect
         print(pos)
-        if x <= pos[0] and y <= pos[1] and x+w >= pos[0] and y+h >= pos[1]:
+        if x <= pos[0] and y <= pos[1] and x+w >= pos[0] and y+h >= pos[1]:#
             print("clicked")
             return True
         return False
@@ -55,7 +55,8 @@ class MainMenu:
         self.img = pygame.image.load('./images/menu2.png')
         self.objects = []
         self.initialize()
-    
+        self.tut_texts=["'Z' to fill up potion at fountain","'E' to drink selected potion","'click' to throw knife","'Space' to catch knife"]
+        self.Font=pygame.font.SysFont("Times New Roman",30)
     def initialize(self):
         self.objects.append(Play(465, 395, 260, 65))
         self.objects.append(Options(465, 490, 260, 65))
@@ -63,3 +64,12 @@ class MainMenu:
     
     def draw(self):
         self.var.screen.blit(self.img, (0,0,*self.var.SCREEN_SIZE))
+        txt_surf1=self.Font.render(self.tut_texts[0],True,(0,0,0))
+        txt_surf2=self.Font.render(self.tut_texts[1],True,(0,0,0))
+        txt_surf3=self.Font.render(self.tut_texts[2],True,(0,0,0))
+        txt_surf4=self.Font.render(self.tut_texts[3],True,(0,0,0))
+
+        self.var.screen.blit(txt_surf1,(800,300))
+        self.var.screen.blit(txt_surf2,(800,350))
+        self.var.screen.blit(txt_surf3,(800,400))
+        self.var.screen.blit(txt_surf4,(800,450))

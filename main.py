@@ -32,7 +32,7 @@ def main():
 
             #game stuff
             self.frame_counter=0
-            
+            self.level_counter=0
             self.obstacles=[]
             self.map=Map(self)
 
@@ -41,10 +41,13 @@ def main():
             self.screen_night_overlay=pygame.transform.scale(self.screen_night_overlay,self.SCREEN_SIZE)
             self.Enemies = [Enemy(self, random.choice(range(200, 1000)), random.choice(range(200, 600))) for _ in range(10)]
 
+            self.goal_img=pygame.image.load("./images/end_goal.png")
+            self.goal_rect=pygame.Rect(1390,1470,32,32)
+            
         def update_camera(self):
             self.camera_scrolling.x-=(self.camera_scrolling.x-(self.player.rect.x-self.SCREEN_SIZE[0]/2))/10
             self.camera_scrolling.y-=(self.camera_scrolling.y-(self.player.rect.y-self.SCREEN_SIZE[1]/2))/10
-        
+
         def set_player_move_bools(self,event):
             if event.type==pygame.KEYDOWN:
                 if event.key==pygame.K_w:
@@ -129,14 +132,18 @@ def main():
             for i in var.obstacles:
                 i.update()
             var.dead_monk.update()
-
+            #blitting goal
+            var.screen.blit(var.goal_img,(var.goal_rect.x-var.camera_scrolling.x,var.goal_rect.y-var.camera_scrolling.y))
+            #checking for goal player collision
+            if var.player.rect.colliderect(var.goal_rect):
+                var.main_menu=True
+                var.game_running=False
+                var.player.rect.x+=100
             var.player.update()
             for enemy in var.Enemies:
                 enemy.update()
             
-            for i in var.obstacles:
-                i.update()
-
+            
             var.inventory.draw()
         
         if var.game_over:

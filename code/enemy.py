@@ -15,6 +15,7 @@ class Enemy(object):
         self.death_animation_duration=20
         self.particles=[]
 
+        self.moving_speed=2.5
         if self.inipos[0] == 'x':
             self.range = (x-100, x+100, 150) # horizontal , vertical and radii range
         else:
@@ -45,42 +46,42 @@ class Enemy(object):
             if math.sqrt((x1-x2)**2 + (y1-y2)**2) < self.range[2]:
                 # print('Following player')
                 if x2 > x1 and x1 < self.var.SCREEN_SIZE[0]:
-                    self.rect.x += 1
+                    self.rect.x += 1*self.moving_speed
                 elif x2 < x1 and x1 > 0:
-                    self.rect.x -= 1
+                    self.rect.x -= 1*self.moving_speed
                 
                 if y2 > y1 and y1 < self.var.SCREEN_SIZE[1]:
-                    self.rect.y += 1
+                    self.rect.y += 1*self.moving_speed
                 elif y2 < y1 and y1 > 0:
-                    self.rect.y -= 1
+                    self.rect.y -= 1*self.moving_speed
             
             elif self.inipos[0] == 'x' and y1 == self.inipos[2]:
                 # print('Moving left and right')
                 if x1 == self.range[0]:
-                    self.dir = -1
+                    self.dir = -1*self.moving_speed
                 elif x1 == self.range[1]:
-                    self.dir = 1
+                    self.dir = 1*self.moving_speed
                 self.rect.x -= self.dir
 
             elif self.inipos[0] == 'y' and x1 == self.inipos[1]:
                 # print('Moving up and down')
                 if y1 == self.range[0]:
-                    self.dir = -1
+                    self.dir = -1*self.moving_speed
                 elif y1 == self.range[1]:
-                    self.dir = 1
+                    self.dir = 1*self.moving_speed
                 self.rect.y -= self.dir
 
             else:
                 # print('Returning back to initial position')
                 if x1 > self.inipos[1]:
-                    self.rect.x -= 1
+                    self.rect.x -= 1*self.moving_speed
                 elif x1 <  self.inipos[1]:
-                    self.rect.x += 1
+                    self.rect.x += 1*self.moving_speed
 
                 if y1 > self.inipos[2]:
-                    self.rect.y -= 1
+                    self.rect.y -= 1*self.moving_speed
                 elif y1 < self.inipos[2]:
-                    self.rect.y += 1
+                    self.rect.y += 1*self.moving_speed
 
             self.draw()
         self.check_self_dead()
@@ -104,15 +105,15 @@ class Enemy(object):
             
 
     def death_animation(self):
-        print("frame-couner:",self.var.frame_counter)
+       # print("frame-couner:",self.var.frame_counter)
         if self.dead==True and self.started_animtion==False:#This should trigger only on the first time
             self.animation_start_frame=self.var.frame_counter
             self.init_death_particles()
             self.started_animtion=True
         else:   
             
-            print("diff",self.var.frame_counter-self.animation_start_frame)
-            print("max:",self.death_animation_duration)
+            #print("diff",self.var.frame_counter-self.animation_start_frame)
+            #print("max:",self.death_animation_duration)
             if self.var.frame_counter-self.animation_start_frame<self.death_animation_duration:#not run out of time
                 for i in self.particles:
                     i.update()
