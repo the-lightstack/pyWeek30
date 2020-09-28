@@ -128,12 +128,8 @@ class Enemy(object):
                     self.var.Enemies.remove(self)
                 except ValueError:
                     pass
-                #print("len of enemies:",len(self.var.Enemies))
-                if len(self.var.Enemies) >= 240:
-                    self.spawn = False
-                    self.var.show_trophy=True
-                    # add the trophy thing here
-                if self.spawn:
+                
+                if self.var.spawn:
                     for _ in range(2):
                         self.var.Enemies.append(Enemy(self.var, random.choice(range(200, 1000)), random.choice(range(200, 600))))
                 self.dead = True

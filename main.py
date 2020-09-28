@@ -24,6 +24,7 @@ def main():
             self.main_menu = True
             self.game_over = False
             self.player=None
+            self.spawn = True
             self.clock=pygame.time.Clock()
             self.FPS=30
             
@@ -146,6 +147,10 @@ def main():
             enemy_len = len(var.Enemies)
             for enemy in var.Enemies:
                 enemy.update()
+            
+            if enemy_len >= 240:
+                var.spawn = False
+                var.show_trophy=True
             
             var.player.health.draw()
             var.inventory.draw()
